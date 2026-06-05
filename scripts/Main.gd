@@ -10,16 +10,16 @@ extends Node2D
 @export var spawn_margin: float = 48.0
 @export var initial_enemy_count: int = 1
 @export var first_upgrade_score: int = 5
-@export var upgrade_score_step_growth: int = 2
+@export var upgrade_score_step_growth: int = 8
 @export var max_coins_growth_per_level: int = 1
-@export var base_max_enemies: int = 6
-@export var max_enemies_growth_per_level: int = 2
+@export var base_max_enemies: int = 10
+@export var max_enemies_growth_per_level: int = 4
 @export var min_enemy_spawn_interval: float = 0.4
 @export var enemy_spawn_interval_decrease_per_level: float = 0.1
 @export var min_coin_spawn_interval: float = 0.3
 @export var coin_spawn_interval_decrease_per_level: float = 0.05
-@export var enemy_speed_growth_per_level: float = 0.08
-@export var enemy_health_growth_per_level: float = 0.2
+@export var enemy_speed_growth_per_level: float = 0.12
+@export var enemy_health_growth_per_level: float = 0.35
 @export var enemy_flat_health_every_levels: int = 3
 @export var coin_drop_chance: float = 0.25
 @export var pickup_drop_chance: float = 0.15
@@ -167,7 +167,8 @@ func spawn_enemy() -> void:
 		_get_enemy_speed(enemy_data),
 		_get_enemy_health(enemy_data),
 		enemy_data["texture"] as Texture2D,
-		float(enemy_data["scale"])
+		float(enemy_data.get("scale", 1.0)),
+		enemy_data.get("modulate", Color.WHITE)
 	)
 	enemy.hit_player.connect(_on_player_hit)
 	enemy.died.connect(_on_enemy_died)
@@ -391,6 +392,7 @@ func _pick_enemy_data() -> Dictionary:
 			"scale": 0.9,
 			"weight": 60,
 			"score": 1,
+			"modulate": Color.WHITE
 		},
 		{
 			"texture": MONSTER_WISP_TEXTURE,
@@ -399,6 +401,7 @@ func _pick_enemy_data() -> Dictionary:
 			"scale": 0.8,
 			"weight": 30,
 			"score": 2,
+			"modulate": Color.WHITE
 		},
 	]
 
@@ -410,6 +413,40 @@ func _pick_enemy_data() -> Dictionary:
 			"scale": 1.1,
 			"weight": 15 + min(20, (level - 3) * 3),
 			"score": 3,
+			"modulate": Color.WHITE
+		})
+
+	if level >= 5:
+		enemy_pool.append({
+			"texture": MONSTER_SLIME_TEXTURE,
+			"speed_scale": 0.5,
+			"base_health": 20,
+			"scale": 1.8,
+			"weight": 5 + (level - 5) * 2,
+			"score": 5,
+			"modulate": Color(0.3, 1.0, 0.4) # Green/Purple tint equivalent
+		})
+
+	if level >= 8:
+		enemy_pool.append({
+			"texture": MONSTER_WISP_TEXTURE,
+			"speed_scale": 1.8,
+			"base_health": 3,
+			"scale": 0.6,
+			"weight": 5 + (level - 8) * 2,
+			"score": 3,
+			"modulate": Color(0.8, 0.1, 0.2) # Dark/Red tint
+		})
+
+	if level >= 12:
+		enemy_pool.append({
+			"texture": MONSTER_BRUTE_TEXTURE,
+			"speed_scale": 0.8,
+			"base_health": 45,
+			"scale": 1.5,
+			"weight": 3 + (level - 12) * 2,
+			"score": 10,
+			"modulate": Color(1.0, 0.2, 0.2) # Crimson tint
 		})
 
 	var total_weight := 0

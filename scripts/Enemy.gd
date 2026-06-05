@@ -52,7 +52,7 @@ func _on_body_entered(body: Node) -> void:
 		hit_player.emit()
 
 
-func configure(target_node: Node2D, move_speed: float, enemy_health: int, texture: Texture2D, visual_scale: float) -> void:
+func configure(target_node: Node2D, move_speed: float, enemy_health: int, texture: Texture2D, visual_scale: float, modulate_color: Color = Color.WHITE) -> void:
 	target = target_node
 	speed = move_speed
 	base_speed = move_speed
@@ -60,6 +60,8 @@ func configure(target_node: Node2D, move_speed: float, enemy_health: int, textur
 	health = max_health
 	scale = Vector2.ONE * visual_scale
 	$Sprite2D.texture = texture
+	$Sprite2D.modulate = modulate_color
+	original_modulate = modulate_color
 	refresh_health_bar()
 
 
