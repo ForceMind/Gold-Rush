@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="floor" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#102336"/>
+      <stop offset="0.55" stop-color="#163446"/>
+      <stop offset="1" stop-color="#1b2b3d"/>
+    </linearGradient>
+    <pattern id="stones" width="96" height="96" patternUnits="userSpaceOnUse">
+      <rect width="96" height="96" fill="none"/>
+      <path d="M0 48 H96 M48 0 V96" stroke="#29475c" stroke-width="2" opacity="0.45"/>
+      <path d="M8 8 H40 V40 H8 Z M56 56 H88 V88 H56 Z" fill="#1f3e50" opacity="0.55"/>
+      <circle cx="74" cy="22" r="4" fill="#3b6d75" opacity="0.45"/>
+      <circle cx="24" cy="72" r="3" fill="#6b8a5d" opacity="0.45"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="720" fill="url(#floor)"/>
+  <rect width="1280" height="720" fill="url(#stones)" opacity="0.85"/>
+  <g opacity="0.65">
+    <path d="M0 96 C180 126 254 48 420 84 C600 122 706 50 892 86 C1044 116 1138 82 1280 110 V0 H0 Z" fill="#0b1b2b"/>
+    <path d="M0 666 C196 612 310 704 506 650 C708 594 824 688 1012 638 C1126 608 1194 620 1280 592 V720 H0 Z" fill="#0b1b2b"/>
+  </g>
+  <g fill="none" stroke="#6aa0a6" stroke-width="3" opacity="0.2">
+    <path d="M80 610 C220 520 280 610 420 540"/>
+    <path d="M850 170 C970 100 1060 204 1190 124"/>
+    <path d="M560 70 C620 128 700 126 770 74"/>
+  </g>
+  <g fill="#ffd76d" opacity="0.3">
+    <circle cx="116" cy="182" r="3"/>
+    <circle cx="238" cy="558" r="2"/>
+    <circle cx="506" cy="258" r="3"/>
+    <circle cx="684" cy="616" r="2"/>
+    <circle cx="1004" cy="452" r="3"/>
+    <circle cx="1148" cy="252" r="2"/>
+  </g>
+  <rect x="18" y="18" width="1244" height="684" fill="none" stroke="#416d78" stroke-width="4" opacity="0.8"/>
+</svg>
