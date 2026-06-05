@@ -127,7 +127,7 @@ func _physics_process(delta: float) -> void:
 	# 环绕球（常驻状态，固定槽位以保证均匀分布）
 	if has_orbit_balls:
 		while orb_slots.size() < orbit_balls:
-			orb_slots.append(null as OrbProjectile)
+			orb_slots.append(null)
 			orb_restore_timers.append(0.0)
 
 		global_orbit_angle += orbit_speed * delta
@@ -312,29 +312,6 @@ func _fire_nova() -> void:
 
 	var _am = get_node_or_null("/root/AudioManager")
 	if _am: _am.play_enemy_die()
-
-
-func _fire_orbit() -> void:
-	var angle_step := TAU / float(orbit_balls)
-
-	for index in range(orbit_balls):
-		var start_angle := angle_step * float(index)
-		var orb := ORB_PROJECTILE_SCENE.instantiate() as OrbProjectile
-		projectiles.add_child(orb)
-		orb.setup(
-			player,
-			start_angle,
-			int(damage * orbit_damage_multiplier),
-			orbit_radius,
-			orbit_speed,
-			projectile_scale * 1.2
-		)
-		orb.hit_enemy.connect(_on_orb_hit_enemy)
-		orb.orb_hit.connect(_on_orb_hit)
-		active_orbs.append(orb)
-
-	var _am = get_node_or_null("/root/AudioManager")
-	if _am: _am.play_upgrade_select()
 
 
 func _on_orb_hit_enemy(_enemy: Enemy) -> void:
