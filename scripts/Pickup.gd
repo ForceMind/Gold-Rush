@@ -69,7 +69,6 @@ func _on_body_entered(body: Node) -> void:
 
 	if body is Player:
 		was_collected = true
-		set_deferred("monitoring", false)
 		collected.emit(self)
 
 
