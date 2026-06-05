@@ -65,6 +65,7 @@ func _ready() -> void:
 	enemy_timer.timeout.connect(_on_enemy_timer_timeout)
 	ui.upgrade_selected.connect(_on_upgrade_selected)
 	ui.back_to_menu.connect(_on_back_to_menu)
+	ui.restart_game.connect(start_game)
 	ui.set_player(player)
 	_show_start_screen()
 

@@ -4,6 +4,7 @@ class_name GameUI
 # 更新 HUD、游戏结束界面和 Roguelike 升级选择。
 signal upgrade_selected(upgrade_id: String)
 signal back_to_menu
+signal restart_game
 
 @onready var score_label: Label = $ScoreLabel
 @onready var level_label: Label = $LevelLabel
@@ -34,8 +35,9 @@ func _ready() -> void:
 	for index in range(option_buttons.size()):
 		option_buttons[index].pressed.connect(_on_option_pressed.bind(index))
 
-	# 连接返回主菜单按钮
+	# 连接按钮
 	$GameOverPanel/BackToMenuButton.pressed.connect(_on_back_to_menu_pressed)
+	$GameOverPanel/RestartButton.pressed.connect(func(): restart_game.emit())
 
 	# 检测是否为移动设备
 	var is_mobile := OS.has_feature("mobile") or OS.has_feature("web_android") or OS.has_feature("web_ios")
@@ -66,7 +68,7 @@ func _setup_fonts() -> void:
 	_apply_font($UpgradePanel/UpgradeHintLabel, 24)
 	_apply_font($GameOverPanel/GameOverLabel, 76)
 	_apply_font($GameOverPanel/FinalScoreLabel, 38)
-	_apply_font($GameOverPanel/RestartLabel, 30)
+	_apply_font($GameOverPanel/RestartButton, 28)
 	_apply_font($GameOverPanel/BackToMenuButton, 28)
 	for btn in option_buttons:
 		_apply_font(btn, 22)
