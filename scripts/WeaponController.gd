@@ -54,8 +54,8 @@ var orbit_timer: float = 0.0
 var orbit_balls: int = 3
 var orbit_radius: float = 80.0
 var orbit_speed: float = 3.0
-var active_orbs: Array[OrbProjectile] = []
-var destroyed_orbs: int = 0
+var global_orbit_angle: float = 0.0
+var orb_slots: Array[OrbProjectile] = []
 var orb_restore_timers: Array[float] = []
 
 var has_freeze_field: bool = false
@@ -87,9 +87,12 @@ func reset() -> void:
 	orbit_balls = orbit_balls_base
 	orbit_radius = orbit_radius_base
 	orbit_speed = orbit_speed_base
-	active_orbs.clear()
-	destroyed_orbs = 0
+	for orb in orb_slots:
+		if is_instance_valid(orb):
+			orb.queue_free()
+	orb_slots.clear()
 	orb_restore_timers.clear()
+	global_orbit_angle = 0.0
 
 	has_freeze_field = false
 	freeze_cooldown = freeze_cooldown_base
@@ -121,21 +124,28 @@ func _physics_process(delta: float) -> void:
 			_fire_nova()
 			nova_timer = nova_cooldown
 
-	# 环绕球（常驻状态，自动补充）
+	# 环绕球（常驻状态，固定槽位以保证均匀分布）
 	if has_orbit_balls:
-		# 刚获得技能或升级增加了上限，直接补充
-		var expected_orbs := orbit_balls
-		var current_tracked := active_orbs.size() + orb_restore_timers.size()
-		if current_tracked < expected_orbs:
-			for _i in range(expected_orbs - current_tracked):
-				_restore_orb()
+		while orb_slots.size() < orbit_balls:
+			orb_slots.append(null as OrbProjectile)
+			orb_restore_timers.append(0.0)
 
-		# 恢复被摧毁的魔球
-		for i in range(orb_restore_timers.size() - 1, -1, -1):
-			orb_restore_timers[i] -= delta
-			if orb_restore_timers[i] <= 0.0:
-				orb_restore_timers.remove_at(i)
-				_restore_orb()
+		global_orbit_angle += orbit_speed * delta
+		var angle_step := TAU / float(orbit_balls)
+
+		for i in range(orbit_balls):
+			var orb := orb_slots[i]
+			if orb != null:
+				if is_instance_valid(orb):
+					orb.update_orbit(player.global_position, global_orbit_angle + angle_step * float(i))
+				else:
+					orb_slots[i] = null
+					orb_restore_timers[i] = orbit_cooldown
+
+			if orb_slots[i] == null:
+				orb_restore_timers[i] -= delta
+				if orb_restore_timers[i] <= 0.0:
+					_spawn_orb_in_slot(i)
 
 	# 冰冻领域（自动触发）
 	if has_freeze_field:
@@ -332,29 +342,19 @@ func _on_orb_hit_enemy(_enemy: Enemy) -> void:
 	if _am: _am.play_enemy_hit()
 
 
-func _on_orb_hit(orb: OrbProjectile) -> void:
-	active_orbs.erase(orb)
-	orb_restore_timers.append(orbit_cooldown)
-
-
-func _restore_orb() -> void:
-	if not has_orbit_balls:
-		return
-
-	var angle := randf() * TAU
+func _spawn_orb_in_slot(index: int) -> void:
 	var orb := ORB_PROJECTILE_SCENE.instantiate() as OrbProjectile
 	projectiles.add_child(orb)
 	orb.setup(
 		player,
-		angle,
+		0.0,
 		int(damage * orbit_damage_multiplier),
 		orbit_radius,
 		orbit_speed,
 		projectile_scale * 1.2
 	)
 	orb.hit_enemy.connect(_on_orb_hit_enemy)
-	orb.orb_hit.connect(_on_orb_hit)
-	active_orbs.append(orb)
+	orb_slots[index] = orb
 
 
 func _activate_freeze_field() -> void:
