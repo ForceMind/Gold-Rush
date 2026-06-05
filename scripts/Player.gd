@@ -23,6 +23,17 @@ var double_coin_timer: float = 0.0
 var shield_visual: Node2D = null
 
 
+func reset_pickups() -> void:
+	has_magnet = false
+	magnet_timer = 0.0
+	has_shield = false
+	shield_timer = 0.0
+	speed_boost_timer = 0.0
+	has_double_coin = false
+	double_coin_timer = 0.0
+	speed = base_speed
+	_remove_shield_visual()
+
 func _physics_process(delta: float) -> void:
 	var direction := _read_movement_input()
 

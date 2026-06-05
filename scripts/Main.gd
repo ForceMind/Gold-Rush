@@ -123,6 +123,7 @@ func start_game() -> void:
 	player.velocity = Vector2.ZERO
 	player.set_physics_process(true)
 	player.show()
+	player.reset_pickups()
 
 	weapon_controller.player = player
 	weapon_controller.enemies = enemies
