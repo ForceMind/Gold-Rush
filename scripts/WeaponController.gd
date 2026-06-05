@@ -56,7 +56,6 @@ var orbit_radius: float = 80.0
 var orbit_speed: float = 3.0
 var active_orbs: Array[OrbProjectile] = []
 var destroyed_orbs: int = 0
-var orb_restore_time: float = 5.0
 var orb_restore_timers: Array[float] = []
 
 var has_freeze_field: bool = false
@@ -122,12 +121,14 @@ func _physics_process(delta: float) -> void:
 			_fire_nova()
 			nova_timer = nova_cooldown
 
-	# 环绕球（自动触发）
+	# 环绕球（常驻状态，自动补充）
 	if has_orbit_balls:
-		orbit_timer -= delta
-		if orbit_timer <= 0.0:
-			_fire_orbit()
-			orbit_timer = orbit_cooldown
+		# 刚获得技能或升级增加了上限，直接补充
+		var expected_orbs := orbit_balls
+		var current_tracked := active_orbs.size() + orb_restore_timers.size()
+		if current_tracked < expected_orbs:
+			for _i in range(expected_orbs - current_tracked):
+				_restore_orb()
 
 		# 恢复被摧毁的魔球
 		for i in range(orb_restore_timers.size() - 1, -1, -1):
@@ -229,9 +230,9 @@ func _get_upgrade_pool() -> Array[Dictionary]:
 		pool.append({"id": "nova_upgrade", "name": "新星强化", "description": "新星 +4 发，冷却 -1 秒。"})
 
 	if not has_orbit_balls:
-		pool.append({"id": "orbit_balls", "name": "环绕魔球", "description": "每 %.1f 秒生成 %d 个环绕魔球。" % [orbit_cooldown_base, orbit_balls_base]})
+		pool.append({"id": "orbit_balls", "name": "环绕魔球", "description": "生成 %d 个环绕魔球（碎裂后 %.1f 秒恢复）。" % [orbit_balls_base, orbit_cooldown_base]})
 	else:
-		pool.append({"id": "orbit_upgrade", "name": "环绕强化", "description": "环绕球 +2 个，冷却 -0.5 秒。"})
+		pool.append({"id": "orbit_upgrade", "name": "环绕强化", "description": "环绕球 +2 个，恢复时间 -0.5 秒。"})
 
 	if not has_freeze_field:
 		pool.append({"id": "freeze_field", "name": "冰冻领域", "description": "每 %.1f 秒冻住周围怪物 %.1f 秒。" % [freeze_cooldown_base, freeze_duration_base]})
@@ -333,7 +334,7 @@ func _on_orb_hit_enemy(_enemy: Enemy) -> void:
 
 func _on_orb_hit(orb: OrbProjectile) -> void:
 	active_orbs.erase(orb)
-	orb_restore_timers.append(orb_restore_time)
+	orb_restore_timers.append(orbit_cooldown)
 
 
 func _restore_orb() -> void:
