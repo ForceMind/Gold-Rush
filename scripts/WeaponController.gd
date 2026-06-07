@@ -314,9 +314,14 @@ func _fire_nova() -> void:
 	if _am: _am.play_enemy_die()
 
 
-func _on_orb_hit_enemy(_enemy: Enemy) -> void:
+func _on_orb_hit_enemy(_enemy: Enemy, orb: OrbProjectile) -> void:
 	var _am = get_node_or_null("/root/AudioManager")
 	if _am: _am.play_enemy_hit()
+
+	var index := orb_slots.find(orb)
+	if index != -1:
+		orb_slots[index] = null
+		orb_restore_timers[index] = orbit_cooldown
 
 
 func _spawn_orb_in_slot(index: int) -> void:

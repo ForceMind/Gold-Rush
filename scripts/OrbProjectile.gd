@@ -2,7 +2,7 @@ extends Area2D
 class_name OrbProjectile
 
 # 围绕玩家旋转的魔球，接触敌人时造成伤害，然后消失。
-signal hit_enemy(enemy: Enemy)
+signal hit_enemy(enemy: Enemy, orb: OrbProjectile)
 
 var damage: int = 1
 var orbit_radius: float = 80.0
@@ -27,5 +27,5 @@ func _on_area_entered(area: Area2D) -> void:
 		return
 
 	area.take_damage(damage)
-	hit_enemy.emit(area)
-	queue_free.call_deferred()
+	hit_enemy.emit(area, self)
+	queue_free()
