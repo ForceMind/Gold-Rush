@@ -240,7 +240,7 @@ func _get_upgrade_pool() -> Array[Dictionary]:
 		pool.append({"id": "nova_upgrade", "name": "新星强化", "description": "新星 +4 发，冷却 -1 秒。"})
 
 	if not has_orbit_balls:
-		pool.append({"id": "orbit_balls", "name": "环绕魔球", "description": "生成 %d 个环绕魔球（碎裂后 %.1f 秒恢复）。" % [orbit_balls_base, orbit_cooldown_base]})
+		pool.append({"id": "orbit_balls", "name": "环绕魔球", "description": "生成 %d 个环绕魔球。" % orbit_balls_base})
 	else:
 		pool.append({"id": "orbit_upgrade", "name": "环绕强化", "description": "环绕球 +2 个，恢复时间 -0.5 秒。"})
 
