@@ -131,21 +131,28 @@ func _physics_process(delta: float) -> void:
 			orb_restore_timers.append(0.0)
 
 		global_orbit_angle += orbit_speed * delta
-		var angle_step := TAU / float(orbit_balls)
 
 		for i in range(orbit_balls):
 			var orb := orb_slots[i]
-			if orb != null:
-				if is_instance_valid(orb):
-					orb.update_orbit(player.global_position, global_orbit_angle + angle_step * float(i))
-				else:
-					orb_slots[i] = null
-					orb_restore_timers[i] = orbit_cooldown
+			if orb != null and not is_instance_valid(orb):
+				orb_slots[i] = null
+				orb_restore_timers[i] = orbit_cooldown
 
 			if orb_slots[i] == null:
 				orb_restore_timers[i] -= delta
 				if orb_restore_timers[i] <= 0.0:
 					_spawn_orb_in_slot(i)
+
+		var alive_orbs: Array[OrbProjectile] = []
+		for orb in orb_slots:
+			if orb != null and is_instance_valid(orb):
+				alive_orbs.append(orb)
+
+		var alive_count := alive_orbs.size()
+		if alive_count > 0:
+			var angle_step := TAU / float(alive_count)
+			for i in range(alive_count):
+				alive_orbs[i].update_orbit(player.global_position, global_orbit_angle + angle_step * float(i))
 
 	# 冰冻领域（自动触发）
 	if has_freeze_field:
@@ -175,6 +182,7 @@ func apply_upgrade(upgrade_id: String) -> void:
 			damage += heavy_bolt_damage_bonus
 		"split_bolt":
 			projectile_count += split_bolt_count_bonus
+			spread_angle = min(0.55, spread_angle + 0.05)
 		"piercing_bolt":
 			pierce += piercing_bolt_bonus
 		"swift_bolt":
@@ -272,10 +280,10 @@ func _fire_at(target_position: Vector2) -> void:
 	if base_direction == Vector2.ZERO:
 		base_direction = Vector2.RIGHT
 
-	var angle_step := TAU / float(projectile_count) if projectile_count > 1 else 0.0
+	var start_angle := -spread_angle * float(projectile_count - 1) * 0.5
 
 	for index in range(projectile_count):
-		var angle_offset := angle_step * float(index)
+		var angle_offset := start_angle + spread_angle * float(index)
 		var direction := base_direction.rotated(angle_offset)
 		var projectile := PROJECTILE_SCENE.instantiate() as Projectile
 		projectiles.add_child(projectile)
