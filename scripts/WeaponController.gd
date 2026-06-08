@@ -175,7 +175,6 @@ func apply_upgrade(upgrade_id: String) -> void:
 			damage += heavy_bolt_damage_bonus
 		"split_bolt":
 			projectile_count += split_bolt_count_bonus
-			spread_angle = min(0.55, spread_angle + 0.05)
 		"piercing_bolt":
 			pierce += piercing_bolt_bonus
 		"swift_bolt":
@@ -273,10 +272,10 @@ func _fire_at(target_position: Vector2) -> void:
 	if base_direction == Vector2.ZERO:
 		base_direction = Vector2.RIGHT
 
-	var start_angle := -spread_angle * float(projectile_count - 1) * 0.5
+	var angle_step := TAU / float(projectile_count) if projectile_count > 1 else 0.0
 
 	for index in range(projectile_count):
-		var angle_offset := start_angle + spread_angle * float(index)
+		var angle_offset := angle_step * float(index)
 		var direction := base_direction.rotated(angle_offset)
 		var projectile := PROJECTILE_SCENE.instantiate() as Projectile
 		projectiles.add_child(projectile)
